@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Dark theme styles for registration page */
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-black);
+        color: var(--text-light);
+    }
+
+    .auth-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        padding: 2.5rem;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+        width: 100%;
+        max-width: 420px;
+        border: 1px solid var(--border);
+        color: var(--text-light);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-header h2 {
+        color: var(--text-light);
+        font-size: 1.8rem;
+        margin-bottom: 0.25rem;
+        text-shadow: 0 0 10px rgba(127,227,167,0.3);
+    }
+
+    .auth-header p {
+        color: var(--muted-text);
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px;
+        transition: all 0.18s ease;
+        background: transparent;
+        color: var(--text-light);
+    }
+
+    .form-control::placeholder {
+        color: rgba(230,251,255,0.45);
+    }
+
+    .form-control:focus {
+        border-color: var(--accent-green);
+        box-shadow: 0 0 0 0.2rem rgba(127,227,167,0.08);
+        outline: none;
+    }
+
+    .auth-btn {
+        background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+        color: #000;
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+
+    .auth-btn:hover {
+        filter: brightness(1.05);
+        transform: translateY(-1px);
+    }
+
+    .error-message {
+        background-color: rgba(255,69,58,0.06);
+        border: 1px solid rgba(239,68,68,0.14);
+        color: #ffcccc;
+        padding: 0.9rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .help-text {
+        font-size: 0.875rem;
+        color: var(--muted-text);
+        margin-top: 0.25rem;
+    }
+
+    .auth-links {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .auth-links a {
+        color: var(--accent-blue);
+        text-decoration: none;
+        transition: all 0.18s ease;
+    }
+
+    .auth-links a:hover {
+        color: var(--accent-green);
+        text-decoration: none;
+        text-shadow: 0 0 10px rgba(127,227,167,0.3);
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Register</h2>
+            <p>Create your Hostel Query Account</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" name="full_name" id="full_name" class="form-control" required
+                       placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="roll_number">Roll Number</label>
+                <input type="text" name="roll_number" id="roll_number" class="form-control" required
+                       placeholder="Enter your roll number">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" class="form-control" required
+                       placeholder="Enter your email address">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-control" required
+                       placeholder="Enter your password">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control" required
+                       placeholder="Confirm your password">
+            </div>
+            <div class="form-group">
+                <label for="room_number">Room Number</label>
+                <input type="text" name="room_number" id="room_number" class="form-control" required
+                       placeholder="Enter your room number">
+            </div>
+            <button type="submit" class="auth-btn">Register</button>
+        </form>
+
+        <div class="auth-links">
+            <a href="{% url 'login' %}">Already have an account? Login here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

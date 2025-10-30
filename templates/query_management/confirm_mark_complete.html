@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Confirm mark complete</h3>
+  <p>Are you sure you want to mark Query {{ query.id }} as completed?</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="admin_notes">Optional admin notes</label>
+      <textarea name="admin_notes" id="admin_notes" class="form-control" rows="3" placeholder="Add a note..."></textarea>
+    </div>
+    <button class="btn btn-danger" type="submit">Yes, mark as completed</button>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

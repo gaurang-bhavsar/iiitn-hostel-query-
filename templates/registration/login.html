@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Make login page fully dark and high-contrast */
+    .login-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-black);
+        color: var(--text-light);
+    }
+
+    .login-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        padding: 2.5rem;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+        width: 100%;
+        max-width: 420px;
+        border: 1px solid var(--border);
+        color: var(--text-light);
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-header h2 {
+        color: var(--text-light);
+        font-size: 1.8rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .login-header p {
+        color: var(--muted-text);
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px;
+        transition: all 0.18s ease;
+        background: transparent;
+        color: var(--text-light);
+    }
+
+    .form-control::placeholder { color: rgba(230,251,255,0.45); }
+
+    .form-control:focus {
+        border-color: var(--accent-green);
+        box-shadow: 0 0 0 0.2rem rgba(127,227,167,0.08);
+        outline: none;
+    }
+
+    .login-btn {
+        background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+        color: #000;
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+
+    .login-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+    .error-message {
+        background-color: rgba(255,69,58,0.06);
+        border: 1px solid rgba(239,68,68,0.14);
+        color: #ffcccc;
+        padding: 0.9rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Admin Login</h2>
+            <p>Hostel Query Management System</p>
+        </div>
+
+        {% if form.errors %}
+        <div class="error-message">
+            Invalid username or password. Please try again.
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'admin:login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control" required 
+                       placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                <input type="password" name="password" id="id_password" class="form-control" required
+                       placeholder="Enter your password">
+            </div>
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

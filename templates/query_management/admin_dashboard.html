@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Superuser Dashboard — All Queries</h2>
+  <p>Only visible to superusers. Use the actions to manage query statuses.</p>
+
+  <table class="table table-striped mt-3">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Submitted At</th>
+        <th>Student</th>
+        <th>Student ID</th>
+        <th>Room</th>
+        <th>Hostel</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for q in queries %}
+      <tr>
+        <td>{{ q.id }}</td>
+        <td>{{ q.created_at }}</td>
+        <td>{% if q.student_profile %}{{ q.student_profile.user.first_name }} ({{ q.student_profile.user.email }}){% else %}{{ q.student_name }}{% endif %}</td>
+        <td>{{ q.student_id }}</td>
+        <td>{{ q.room_number }}</td>
+        <td>{{ q.get_hostel_type_display }}</td>
+        <td>{{ q.get_query_category_display }}</td>
+        <td>{{ q.get_status_display }}</td>
+        <td>
+          {% if q.status != 'R' %}
+          <form method="post" action="{% url 'mark_complete' q.id %}">
+            {% csrf_token %}
+            <div class="input-group">
+              <input type="text" name="admin_notes" class="form-control form-control-sm" placeholder="Optional note">
+              <div class="input-group-append">
+                <button class="btn btn-success btn-sm" type="submit">Mark Completed</button>
+              </div>
+            </div>
+          </form>
+          {% else %}
+            <span class="text-success">Completed</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="9">No queries found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

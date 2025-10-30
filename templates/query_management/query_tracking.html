@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Query Tracking</h2>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Query Details</h5>
+            
+            <!-- Student Information -->
+            <div class="section mb-4">
+                <h6 class="font-weight-bold">Student Information</h6>
+                <p><strong>Name:</strong> {{ query.student_name }}</p>
+                <p><strong>Student ID:</strong> {{ query.student_id }}</p>
+                <p><strong>Contact:</strong> {{ query.contact_number }}</p>
+            </div>
+
+            <!-- Location Information -->
+            <div class="section mb-4">
+                <h6 class="font-weight-bold">Location</h6>
+                <p><strong>Room Number:</strong> {{ query.room_number }}</p>
+                <p><strong>Hostel Block:</strong> {{ query.get_hostel_type_display }}</p>
+            </div>
+
+            <!-- Query Information -->
+            <div class="section mb-4">
+                <h6 class="font-weight-bold">Query Information</h6>
+                <p><strong>Category:</strong> {{ query.get_query_category_display }}</p>
+                <p><strong>Description:</strong> {{ query.query_text }}</p>
+                {% if query.additional_notes %}
+                <p><strong>Additional Notes:</strong> {{ query.additional_notes }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Status Information -->
+            <div class="section mb-4">
+                <h6 class="font-weight-bold">Status</h6>
+                <p><strong>Current Status:</strong> 
+                    <span class="badge {% if query.status == 'P' %}badge-warning
+                          {% elif query.status == 'IP' %}badge-primary
+                          {% else %}badge-success{% endif %}">
+                        {{ query.get_status_display }}
+                    </span>
+                </p>
+                <p><strong>Submitted on:</strong> {{ query.created_at|date:"F d, Y H:i" }}</p>
+                {% if query.expected_resolution_time %}
+                    <p><strong>Expected Resolution:</strong> {{ query.expected_resolution_time|date:"F d, Y H:i" }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
