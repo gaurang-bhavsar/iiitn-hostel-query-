@@ -18,7 +18,7 @@ def landing_page(request):
         query_text = request.POST.get('query_text')
         additional_notes = request.POST.get('additional_notes')
 
-        # Create query object
+        # Create query object with current user
         query = Query.objects.create(
             room_number=room_number,
             hostel_type=hostel_type,
@@ -27,7 +27,9 @@ def landing_page(request):
             contact_number=contact_number,
             query_category=query_category,
             query_text=query_text,
-            additional_notes=additional_notes
+            additional_notes=additional_notes,
+            student_profile=request.user,
+            created_at=timezone.localtime()
         )
         
         messages.success(request, 'Your query has been submitted successfully!')
@@ -113,12 +115,43 @@ def superuser_check(user):
 @user_passes_test(superuser_check)
 def dashboard(request):
     """Superuser dashboard listing all queries with quick actions."""
-    # Show only pending queries on the dashboard as requested
-    queries = Query.objects.filter(status='P').order_by('-created_at')
-    if request.method == 'POST':
-        # handle bulk actions or redirects if needed
-        return redirect('dashboard')
-    return render(request, 'query_management/admin_dashboard.html', {'queries': queries})
+    # Get all queries initially
+    queries = Query.objects.all()
+    
+    # Get sorting parameters
+    sort_by = request.GET.get('sort', '-created_at')
+    category_filter = request.GET.get('category')
+    status_filter = request.GET.get('status')
+    
+    # Apply filters
+    if category_filter:
+        queries = queries.filter(query_category=category_filter)
+    if status_filter:
+        queries = queries.filter(status=status_filter)
+    
+    # Apply sorting
+    if sort_by == 'category':
+        queries = queries.order_by('query_category', '-created_at')
+    elif sort_by == 'status':
+        queries = queries.order_by('status', '-created_at')
+    elif sort_by == 'oldest':
+        queries = queries.order_by('created_at')
+    else:  # Default to newest first
+        queries = queries.order_by('-created_at')
+    
+    # Get unique categories for the filter dropdown
+    categories = Query.QUERY_CATEGORIES
+    
+    context = {
+        'queries': queries,
+        'categories': categories,
+        'current_category': category_filter,
+        'current_sort': sort_by,
+        'current_status': status_filter,
+        'status_choices': Query.STATUS_CHOICES
+    }
+    
+    return render(request, 'query_management/admin_dashboard.html', context)
 
 
 @user_passes_test(superuser_check)

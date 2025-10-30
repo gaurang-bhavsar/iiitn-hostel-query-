@@ -71,6 +71,7 @@ class Query(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     admin_notes = models.TextField(blank=True, null=True)
+    completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='completed_queries')
 
     def __str__(self):
         return f"Query {self.id} - Room {self.room_number} ({self.get_hostel_type_display()})"

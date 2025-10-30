@@ -1,11 +1,163 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2>Superuser Dashboard — All Queries</h2>
-  <p>Only visible to superusers. Use the actions to manage query statuses.</p>
+<style>
+    .dashboard-container {
+        padding: 2rem;
+        background: var(--surface-dark);
+        border: 5px solid var(--accent-green);
+        border-radius: 15px;
+        margin: 2rem auto;
+        box-shadow: var(--border-glow);
+    }
 
-  <table class="table table-striped mt-3">
+    .dashboard-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 5px solid var(--accent-green);
+    }
+
+    .dashboard-header h2 {
+        color: var(--text-light);
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+        color: var(--muted-text);
+        margin-bottom: 0;
+    }
+
+    .query-table {
+        border: 5px solid var(--accent-green);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--surface-dark);
+    }
+
+    .query-table th {
+        background: rgba(127,227,167,0.1);
+        border-bottom: 5px solid var(--accent-green) !important;
+        padding: 1rem !important;
+        color: var(--accent-green) !important;
+    }
+
+    .query-table td {
+        padding: 1rem !important;
+        border-top: none !important;
+        border-bottom: 2px solid rgba(127,227,167,0.2) !important;
+    }
+
+    .query-table tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    .action-form {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-form input {
+        border: 2px solid var(--accent-green) !important;
+        border-radius: 6px;
+        background: transparent;
+    }
+
+    .action-btn {
+        background: var(--accent-green) !important;
+        color: var(--bg-black) !important;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
+
+    .controls-container {
+        background: var(--surface);
+        border: 1px solid var(--accent);
+        border-radius: var(--border-radius-md);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .controls-container label {
+        color: var(--text);
+        font-weight: 500;
+    }
+
+    .controls-container select {
+        background: var(--bg-primary);
+        border: 1px solid var(--accent);
+        color: var(--text);
+        border-radius: var(--border-radius-sm);
+    }
+
+    .controls-container .btn {
+        background: var(--accent);
+        color: var(--text);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius-sm);
+        transition: all 0.3s ease;
+    }
+
+    .controls-container .btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h2>Superuser Dashboard — All Queries</h2>
+        <p>Only visible to superusers. Use the actions to manage query statuses.</p>
+        
+        <!-- Sorting and Filtering Controls -->
+        <div class="controls-container mt-4">
+            <form method="get" class="row align-items-center">
+                <div class="col-md-3">
+                    <label class="mb-2">Sort by:</label>
+                    <select name="sort" class="form-control" onchange="this.form.submit()">
+                        <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="category" {% if current_sort == 'category' %}selected{% endif %}>Category</option>
+                        <option value="status" {% if current_sort == 'status' %}selected{% endif %}>Status</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="mb-2">Filter by Category:</label>
+                    <select name="category" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for code, name in categories %}
+                            <option value="{{ code }}" {% if current_category == code %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="mb-2">Filter by Status:</label>
+                    <select name="status" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        {% for code, name in status_choices %}
+                            <option value="{{ code }}" {% if current_status == code %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="mb-2">&nbsp;</label>
+                    <button type="submit" class="btn btn-secondary d-block w-100">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="query-table">
+        <table class="table table-hover">
     <thead>
       <tr>
         <th>ID</th>
@@ -32,14 +184,10 @@
         <td>{{ q.get_status_display }}</td>
         <td>
           {% if q.status != 'R' %}
-          <form method="post" action="{% url 'mark_complete' q.id %}">
+          <form method="post" action="{% url 'mark_complete' q.id %}" class="action-form">
             {% csrf_token %}
-            <div class="input-group">
-              <input type="text" name="admin_notes" class="form-control form-control-sm" placeholder="Optional note">
-              <div class="input-group-append">
-                <button class="btn btn-success btn-sm" type="submit">Mark Completed</button>
-              </div>
-            </div>
+            <input type="text" name="admin_notes" class="form-control" placeholder="Optional note">
+            <button type="submit" class="action-btn">Mark Completed</button>
           </form>
           {% else %}
             <span class="text-success">Completed</span>
@@ -52,6 +200,7 @@
       </tr>
       {% endfor %}
     </tbody>
-  </table>
+        </table>
+    </div>
 </div>
 {% endblock %}
